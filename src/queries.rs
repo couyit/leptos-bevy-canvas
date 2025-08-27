@@ -42,11 +42,11 @@ where
 pub trait QueryDataOwned<'q> {
     type Qdata: QueryData;
 
-    fn from_query_data<'a>(data: &<Self::Qdata as QueryData>::Item<'a>) -> Self;
+    fn from_query_data<'a>(data: &<Self::Qdata as QueryData>::Item<'_, 'a>) -> Self;
 
-    fn set_query_data<'a>(&self, data: &mut <Self::Qdata as QueryData>::Item<'a>);
+    fn set_query_data<'a>(&self, data: &mut <Self::Qdata as QueryData>::Item<'_, 'a>);
 
-    fn is_changed<'a>(data: &<Self::Qdata as QueryData>::Item<'a>) -> bool;
+    fn is_changed<'a>(data: &<Self::Qdata as QueryData>::Item<'_, 'a>) -> bool;
 }
 
 macro_rules! impl_as_query_data {
@@ -55,7 +55,7 @@ macro_rules! impl_as_query_data {
         impl<'q, $($name: bevy::prelude::Component<Mutability = Mutable> + Clone),*> QueryDataOwned<'q> for ($($name,)*) {
             type Qdata = ($(&'q mut $name,)*);
 
-            fn from_query_data<'a>(data: &<Self::Qdata as QueryData>::Item<'a>) -> Self {
+            fn from_query_data<'a>(data: &<Self::Qdata as QueryData>::Item<'_, 'a>) -> Self {
                 paste! {
                     let ($([<$name:lower>],)*) = data;
                     ($(
@@ -64,7 +64,7 @@ macro_rules! impl_as_query_data {
                 }
             }
 
-            fn set_query_data<'a>(&self, data: &mut <Self::Qdata as QueryData>::Item<'a>) {
+            fn set_query_data<'a>(&self, data: &mut <Self::Qdata as QueryData>::Item<'_, 'a>) {
                 paste! {
                     let ($([<$name:lower>],)*) = data;
                     let ($([<$name:lower _self>],)*) = self;
@@ -75,7 +75,7 @@ macro_rules! impl_as_query_data {
                 }
             }
 
-            fn is_changed<'a>(data: &<Self::Qdata as QueryData>::Item<'a>) -> bool {
+            fn is_changed<'a>(data: &<Self::Qdata as QueryData>::Item<'_, 'a>) -> bool {
                 paste! {
                     let ($([<$name:lower>],)*) = data;
                     $(

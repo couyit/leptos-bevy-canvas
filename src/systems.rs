@@ -19,9 +19,9 @@ pub struct SyncQuerySet;
 
 /// Keeps track of what Leptos event have been imported into Bevy to prevent infinite loops.
 #[derive(Resource, Deref, DerefMut)]
-pub struct ImportedEventIds<E: Event>(Vec<EventId<E>>);
+pub struct ImportedEventIds<E: BufferedEvent>(Vec<EventId<E>>);
 
-impl<E: Event> Default for ImportedEventIds<E> {
+impl<E: BufferedEvent> Default for ImportedEventIds<E> {
     fn default() -> Self {
         Self(Vec::with_capacity(4))
     }
@@ -34,7 +34,7 @@ pub fn import_and_send_leptos_events<R, E>(
     mut event_writer: EventWriter<E>,
 ) where
     R: HasReceiver<E> + Resource,
-    E: Event,
+    E: BufferedEvent,
 {
     imported_event_ids.clear();
 
@@ -51,7 +51,7 @@ pub fn read_and_export_leptos_events<S, E>(
     mut event_reader: EventReader<E>,
 ) where
     S: HasSender<E> + Resource,
-    E: Event + Clone,
+    E: BufferedEvent + Clone,
 {
     for (event, id) in event_reader.read_with_id() {
         if !imported_event_ids.contains(&id) {

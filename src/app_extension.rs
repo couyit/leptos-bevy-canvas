@@ -9,19 +9,19 @@ pub trait LeptosBevyApp {
     /// Imports an event from Leptos into the Bevy app. Takes the Bevy event receiver as argument.
     fn import_event_from_leptos<R, E>(&mut self, bevy_rx: R) -> &mut Self
     where
-        E: Event,
+        E: BufferedEvent,
         R: HasReceiver<E> + Resource;
 
     /// Exports an event from Bevy to Leptos. Takes the Bevy event sender as argument.
     fn export_event_to_leptos<S, E>(&mut self, bevy_tx: S) -> &mut Self
     where
-        E: Event + Clone,
+        E: BufferedEvent + Clone,
         S: HasSender<E> + Resource;
 
     /// Adds duplex event handling between Bevy and Leptos. Takes the Bevy event receiver/sender as argument.
     fn add_duplex_leptos_event<D, E>(&mut self, bevy_duplex: D) -> &mut Self
     where
-        E: Event + Clone,
+        E: BufferedEvent + Clone,
         D: HasReceiver<E> + HasSender<E> + Resource;
 
     /// Adds resource syncing between Bevy and Leptos. Takes the Bevy resource receiver/sender as argument.
@@ -39,7 +39,7 @@ pub trait LeptosBevyApp {
 impl LeptosBevyApp for App {
     fn import_event_from_leptos<R, E>(&mut self, bevy_rx: R) -> &mut Self
     where
-        E: Event,
+        E: BufferedEvent,
         R: HasReceiver<E> + Resource,
     {
         self.insert_resource(bevy_rx)
@@ -53,7 +53,7 @@ impl LeptosBevyApp for App {
 
     fn export_event_to_leptos<R, E>(&mut self, bevy_tx: R) -> &mut Self
     where
-        E: Event + Clone,
+        E: BufferedEvent + Clone,
         R: HasSender<E> + Resource,
     {
         self.insert_resource(bevy_tx)
@@ -67,7 +67,7 @@ impl LeptosBevyApp for App {
 
     fn add_duplex_leptos_event<D, E>(&mut self, bevy_duplex: D) -> &mut Self
     where
-        E: Event + Clone,
+        E: BufferedEvent + Clone,
         D: HasReceiver<E> + HasSender<E> + Resource,
     {
         self.insert_resource(bevy_duplex)
